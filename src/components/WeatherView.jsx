@@ -1,66 +1,92 @@
-
-import './WeatherView.css'
-
-// npm install react-weathericons
+// import './WeatherView.css'
 import WeatherIcon from 'react-weathericons';
-// Now we can use: <WeatherIcon name="day-sunny" />
+import 'weather-icons/css/weather-icons.css';
+import { iconMapping } from './iconMapping';
+import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 
-///////////////////////////////////////////////////////////////
-// This component displays weather data or nothing
-///////////////////////////////////////////////////////////////
+function WeatherView() {
+  const { weather: data, status, error } = useSelector(state => state.weather)
+  console.log('WeatherView', data, status, error)
 
-// Map the OpenWeatherMap icons to WeatherIcon names. 
-// might be good to move this into another file and import!
-// The icons have day (d) and night (n) versions.
-const iconMapping = {
-  '01d': 'day-sunny',
-  '01n': 'night-clear',
-  '02d': 'day-cloudy',
-  '02n': 'night-alt-cloudy',
-  '03d': 'cloud',
-  '03n': 'cloud',
-  '04d': 'cloudy',
-  '04n': 'cloudy',
-  '09d': 'showers',
-  '09n': 'showers',
-  '10d': 'rain',
-  '10n': 'rain',
-  '11d': 'thunderstorm',
-  '11n': 'thunderstorm',
-  '13d': 'snow',
-  '13n': 'snow',
-  '50d': 'fog',
-  '50n': 'fog'
-};
-
-function WeatherView({ main, name, weather, cod, message }) {
-  // If cod is not 200 we have an error
-  if (cod !== 200) {
-    return <p>Error: {message}</p>
+  if (status !== 'succeeded' || !data) {
+    return null
   }
 
-  // Figure out the icon mapping!
-  // console.log(weather[0].icon)
-  // console.log(iconMapping[weather[0].icon])
+  // If cod is not 200 we have an error
+  let showWeather
+  if (data.cod === 200) {
+    showWeather = 'open'
+  } else if (data.message) {
+    showWeather = 'error'
+  } else {
+    showWeather = 'none'
+  }
 
-  // Might be good to do some deconstruction here! 
+  const { weather, main, name, message } = data
 
   return (
-    <div className="WeatherView">
-      <WeatherIcon 
-        className="weather-icon"
-        name={iconMapping[weather[0].icon]} 
-      />
-      {/* Use the html entity for the ˚ here: &deg; */}
-      <h1>{Math.round(main.temp)}&deg;</h1>
-      {/* The decimal value isn't informing anyone except the 
-          obsesive compulsives and scientists! */}
-      <p className='description'>{weather[0].description}</p>
-      <small>{name}</small>
+    <div
+      className='WeatherView bg-sky-50 flex flex-col items-center justify-center text-center p-6 m-6 shadow-lg'
+    >
+      
+      {/* show this when we have data */}
+      {showWeather === 'open' ? ( 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+
+          {/* Wrap the icon in a motion.div and animate */}
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            <WeatherIcon 
+              className="weather-icon text-5xl text-slate-700 mb-2"
+              // Get the openweathermap icon and map it to weather icons
+              name={iconMapping[weather[0].icon]} 
+            />
+          </motion.div>
+
+          {/* Animate the temp */}
+          <motion.h1
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            // Notice we're using Tailwind along with Framer Motion!
+            className='text-5xl font-semibold text-slate-700 mb-3 ml-5'
+          >{Math.round(main.temp)}&deg;
+          </motion.h1>
+
+          {/* Animate the description */}
+          <motion.p
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className='text-lg text-gray-600 capitalize mb-1'>
+            {weather[0].description}
+          </motion.p>
+
+          {/* Animate the location */}
+          <motion.small
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className='text-gray-600'
+          >
+            {name}
+          </motion.small>
+        </motion.div>
+      ) : (
+        <p
+          key="error"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className='text-red-500 font-semibold'
+        >Error {message}</p>)
+      }
     </div>
   )
 }
 
 export default WeatherView
-
-

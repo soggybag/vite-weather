@@ -1,34 +1,17 @@
-
-import './App.css'
 import Weather from './components/Weather'
-import Weather2 from './components/Weather2'
-import UserDashboard from './components/UserDashBoard'
-import { useState } from 'react'
-import Watcher from './components/Watcher'
-
-import 'weather-icons/css/weather-icons.css';
+import WeatherView from './components/WeatherView'
+import WeatherView2 from './components/WeatherView2'
+import WeatherStatus from './components/WeatherStatus'
+// import './App.css'
 
 function App() {
-  const [show, setShow] = useState(true)
-
   return (
-    <>
+    <div className='h-screen bg-blue-100 p-4 flex items-center justify-center flex-col'>
+      <WeatherView />
+      {/* <WeatherView2 /> */}
       <Weather />
-
-
-      
-      {/* <Weather2 isLoaded={false}/>
-
-      { show && <UserDashboard userId={'EdamameBean'} /> }
-
-      <button
-        onClick={() => setShow(!show)}
-      >{show ? 'Hide' : 'Show'}</button>
-
-      <hr />
-      <Watcher /> */}
-
-    </>
+      <WeatherStatus />
+    </div>
   )
 }
 
